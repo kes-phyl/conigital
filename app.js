@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const date = new Date().toISOString();
+const Json2csvParser = require("json2csv").Parser;
+const cron = require('node-cron')
 
 
 const app = express();
@@ -29,19 +31,6 @@ const expenseSchema =  {
 
 const Expense = mongoose.model('expense', expenseSchema);
 
-// const expense = new Expense({
-//     category: 'Entertainment',
-//     title: 'Movie-Seeing',
-//     cost: 500,
-//     time: date
-// })
-// expense.save(function(err){
-//     if(err){
-//         console.log(err)
-//     }else{
-//         console.log('Successfully saved')
-//     }
-// })
 app.post('/', function(req,res){
     const newCategory = req.body.category;
     const newTitle = req.body.title;
@@ -61,10 +50,12 @@ app.post('/', function(req,res){
     })
 })
 
+
+/////////////////////////////////CREATING THE HOME ROUTE
+
 app.get('/', function(req, res){
     
     res.render('index', {Expenses: 'Coginital Expense Manager'});
-    // res.send('We are working on it... It will be ready on..' + date)
 });
 
 
@@ -80,9 +71,41 @@ app.get('/expenses', function(req,res){
 
 
 
-//635bf5d0e1c684be1c351a19
+//635bf5d0e1c684be1c351a19  
+
+//Downloading the database csv everymin
+ cron.schedule('*/2 * * * *', () => {
+        
+    Expense.find({}, function(err, foundExpenses){
+        if(!err){
+           
+        console.log(foundExpenses);
+        const json2csvParser = new Json2csvParser({ header: true });
+        const csvData = json2csvParser.parse(foundExpenses);
+
+        fs.writeFile("monthly_expense_fs.csv", csvData, function(error) {
+          if (error) throw error;
+          console.log("Write to monthly_expense_fs.csv successfully!");
+        });
 
 
+
+        }
+    })
+
+
+
+    ///////////////////////Empy the database delete all records
+
+    Expense.deleteMany({}, function(err){
+        if(!err){
+            console.log('successfully deleted')
+        }
+    })
+
+
+
+      });
 
 ///////////////////////.......................................GETTING RECEIPT WITH ID.....///////////////////////////////
 
@@ -101,39 +124,38 @@ app.get('/expenses/:id', function(req, res){
 
 
 
-////////////////////////////////////////////////// Downloading the CSV //////////////////////////////////////////////
+// ////////////////////////////////////////////////// Downloading the CSV //////////////////////////////////////////////
 
 
-const newCsvo = function(){
+// const newCsvo = function(){
 
-    Project.find({}, function(err, foundReciepts){
-       if(foundReciepts){
-        for (i = 0; i < foundReciepts.length; i++){
-            totalCost = foundReciepts[i].cost;
-        }
-        foundReciepts.forEach(function(receipt){
+//     Expense.find({}, function(err, foundReciepts){
+//        if(foundReciepts){
+//         for (i = 0; i < foundReciepts.length; i++){
+//             totalCost = foundReciepts[i].cost;
+//         }
+//         foundReciepts.forEach(function(receipt){
 
-            let receiptTotal = receipt.cost;
-            let receiptCategory = receipt.category;
-            let receiptTitle = receipt.title;
-            let costPercentage = (receiptTotal/totalCost) * 100;
+//             let receiptTotal = receipt.cost;
+//             let receiptCategory = receipt.category;
+//             let receiptTitle = receipt.title;
+//             let costPercentage = (receiptTotal/totalCost) * 100;
 
-            let receiptObject = {
-                title: receiptCategory,
-                cost: receiptTotal,
-                costPercentage: costPercentage
-            }
+//             let receiptObject = {
+//                 title: receiptCategory,
+//                 cost: receiptTotal,
+//                 costPercentage: costPercentage
+//             }
 
-            console.log(projectObject);
-            const json2csvParser = new Json2csvParser({ header: true });
-            const csvData = json2csvParser.parse(projectObject);
+//             const json2csvParser = new Json2csvParser({ header: true });
+//             const csvData = json2csvParser.parse(projectObject);
     
-            fs.writeFile("kes_mongodb_fs.csv", csvData, function(error) {
-              if (error) throw error;
-              console.log("Write to kes_mongodb_fs.csv successfully!");
-            });
-            let fileLocation = __dirname + '/kes_mongodb_fs.csv';
-            console.log(fileLocation)
+//             fs.writeFile("kes_mongodb_fs.csv", csvData, function(error) {
+//               if (error) throw error;
+//               console.log("Write to kes_mongodb_fs.csv successfully!");
+//             });
+//             let fileLocation = __dirname + '/kes_mongodb_fs.csv';
+//             console.log(fileLocation)
 
 
 
@@ -143,16 +165,19 @@ const newCsvo = function(){
 
 
             
-        })
-       }
+//         })
+//        }
 
 
-    })
+//     })
 
 
-}
-
-///////////////ending of the function
+// }
+// app.get('/download',function(req, res){
+//     newCsvo();
+//         res.write('Sucessfully sent');
+// })
+// ///////////////ending of the function
 
 
 app.listen(3000,function(){
