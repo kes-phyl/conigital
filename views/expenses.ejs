@@ -1,0 +1,39 @@
+<%- include('header') -%>
+    
+    <div class="container">
+        <div class="header">
+            <h3><%=Expenses%></h3>
+        </div>
+        <div class="container-inner">
+            <div class="content">
+                <h4>Your expenses so far...</h4>
+            </div>
+
+          <%foundExpenses.forEach(function(expense){ %>
+               
+                <div>
+                    <table id="customers">
+                        <tr>
+                          <th>Category</th>
+                          <th>Title</th>
+                          <th>Cost</th>
+                          <th>Time</th>
+                        </tr>
+                        <tr>
+                          <td><%=expense.category%></td>
+                          <td><%=expense.title%></td>
+                          <td><%=expense.cost%></td>
+                          <td><%=expense.time%></td>
+                        </tr>
+                      </table>
+                </div>
+
+
+           <% }) %>
+
+
+         
+        </div>
+        
+    </div>
+    <%- include('footer') -%>
