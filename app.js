@@ -74,8 +74,8 @@ app.get('/expenses', function(req,res){
 
 //635bf5d0e1c684be1c351a19  
 
-//Downloading the database csv everymin
- cron.schedule('*/2 * * * *', () => {
+//Downloading the database csv every 10min
+ cron.schedule('*/10 * * * *', () => {
         
     Expense.find({}, function(err, foundExpenses){
         if(!err){
@@ -124,61 +124,6 @@ app.get('/expenses/:id', function(req, res){
 
 
 
-
-// ////////////////////////////////////////////////// Downloading the CSV //////////////////////////////////////////////
-
-
-// const newCsvo = function(){
-
-//     Expense.find({}, function(err, foundReciepts){
-//        if(foundReciepts){
-//         for (i = 0; i < foundReciepts.length; i++){
-//             totalCost = foundReciepts[i].cost;
-//         }
-//         foundReciepts.forEach(function(receipt){
-
-//             let receiptTotal = receipt.cost;
-//             let receiptCategory = receipt.category;
-//             let receiptTitle = receipt.title;
-//             let costPercentage = (receiptTotal/totalCost) * 100;
-
-//             let receiptObject = {
-//                 title: receiptCategory,
-//                 cost: receiptTotal,
-//                 costPercentage: costPercentage
-//             }
-
-//             const json2csvParser = new Json2csvParser({ header: true });
-//             const csvData = json2csvParser.parse(projectObject);
-    
-//             fs.writeFile("kes_mongodb_fs.csv", csvData, function(error) {
-//               if (error) throw error;
-//               console.log("Write to kes_mongodb_fs.csv successfully!");
-//             });
-//             let fileLocation = __dirname + '/kes_mongodb_fs.csv';
-//             console.log(fileLocation)
-
-
-
-
-
-
-
-
-            
-//         })
-//        }
-
-
-//     })
-
-
-// }
-// app.get('/download',function(req, res){
-//     newCsvo();
-//         res.write('Sucessfully sent');
-// })
-// ///////////////ending of the function
 
 
 app.listen(3000,function(){
